@@ -1,0 +1,8 @@
+h1 Ändra todo 
+
+form action="/todos/#{@todo["id"]}/update" method="post"
+    label for="name" Namn
+    input name="name" value=@todo["name"] placeholder="Namn"
+    label for="description" Beskrivning 
+    input name="description" value=@todo["description"] placeholder="Beskrivning"
+    input type="submit" value="Spara"

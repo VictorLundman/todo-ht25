@@ -5,3 +5,29 @@ body {
   font-size: x-large;
   margin: 1em;
 }
+
+.todo-container {
+  display: grid;
+  grid-template-columns: auto auto;
+}
+
+.todo-actions-container {
+  display: flex;
+}
+
+.todos-container {
+  box-sizing: border-box;
+  width: calc(100% - 4rem);
+  display: grid;
+  grid-template-columns: 60% 40%;
+  gap: 4rem;
+}
+
+.form-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+.form-group label {
+  display: inline-block;
+}

@@ -1,0 +1,23 @@
+.todos-container 
+    div
+        h2 Todo 
+        section.todo-container
+            - @todos.each do |todo|
+                article.todo
+                    h3 = todo["name"]
+                    p = todo["description"]
+                    .todo-actions-container
+                        form action="/todos/#{todo["id"]}/delete" method="post"
+                            input type="submit" value="Radera"
+                        a href="/todos/#{todo["id"]}/edit" Ändra
+
+    div
+        h2 Skapa todo 
+        form action="/todos" method="post"
+            .form-group 
+                label for="name" Namn
+                input name="name" placeholder="Namn"
+            .form-group 
+                label for="description" Beskrivning 
+                input name="description" placeholder="Beskrivning"
+            input type="submit" value="Spara"
