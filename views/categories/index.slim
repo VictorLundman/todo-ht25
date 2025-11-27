@@ -1,0 +1,15 @@
+h1 Kategorier
+
+- @categories.each do |category|
+    h3 = category["name"]
+    div.todo-actions-container
+        form action="/categories/#{category["id"]}/delete" method="post"
+            input type="submit" value="Radera" 
+        a href="/categories/#{category["id"]}/edit" Uppdatera
+
+hr
+
+form action="/categories" method="post"
+    label for="name" Namn
+    input name="name" placeholder="Namn"
+    input type="submit" value="Skapa"

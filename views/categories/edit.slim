@@ -1,0 +1,6 @@
+h1 Ändra kategori
+
+form action="/categories/#{@category["id"]}/update" method="post"
+    label for="name" Namn
+    input name="name" id="name" value=@category["name"] placeholder="Namn"
+    input type="submit" value="Spara"

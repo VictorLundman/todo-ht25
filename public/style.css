@@ -23,6 +23,11 @@ body {
   gap: 4rem;
 }
 
+.todo.done h3,
+.todo.done p {
+  text-decoration: line-through;
+}
+
 .form-group {
   display: flex;
   justify-content: space-between;
@@ -30,4 +35,17 @@ body {
 
 .form-group label {
   display: inline-block;
+}
+
+.todo h3 {
+  margin-bottom: 0.1em;
+}
+
+.todo .category {
+  font-size: medium;
+}
+
+header {
+  display: flex;
+  gap: 1rem;
 }

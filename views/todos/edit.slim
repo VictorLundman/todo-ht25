@@ -2,7 +2,14 @@ h1 Ändra todo
 
 form action="/todos/#{@todo["id"]}/update" method="post"
     label for="name" Namn
-    input name="name" value=@todo["name"] placeholder="Namn"
+    input name="name" id="name" value=@todo["name"] placeholder="Namn"
+    label for="category" Kategori 
+    select name="category" id="category"
+        option selected=(@todo["category_id"] == nil) value="0" Kategorilös
+        - @categories.each do |category|
+            option value=category["id"] selected=(category["id"] == @todo["category_id"]) = category["name"]
     label for="description" Beskrivning 
-    input name="description" value=@todo["description"] placeholder="Beskrivning"
+    input name="description" id="description" value=@todo["description"] placeholder="Beskrivning"
+    label for="is_done" Klar?
+    input id="id_done" name="is_done" type="checkbox" value=@todo["is_done"] checked=@todo["is_done"]
     input type="submit" value="Spara"

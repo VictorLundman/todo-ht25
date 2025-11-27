@@ -1,15 +1,35 @@
 .todos-container 
     div
-        h2 Todo 
-        section.todo-container
-            - @todos.each do |todo|
-                article.todo
-                    h3 = todo["name"]
-                    p = todo["description"]
-                    .todo-actions-container
-                        form action="/todos/#{todo["id"]}/delete" method="post"
-                            input type="submit" value="Radera"
-                        a href="/todos/#{todo["id"]}/edit" Ändra
+        div 
+            h2 Att göra 
+            section.todo-container
+                - @undone_todos.each do |todo|
+                    article.todo
+                        h3 = todo["name"]
+                        span.category = todo["category_name"]
+                        p = todo["description"]
+                        .todo-actions-container
+                            form action="/todos/#{todo["id"]}/update" method="post"
+                                input type="checkbox" hidden=true name="is_done" value="1" checked="1"
+                                input type="submit" value="Markera som klar"
+                            form action="/todos/#{todo["id"]}/delete" method="post"
+                                input type="submit" value="Radera"
+                            a href="/todos/#{todo["id"]}/edit" Ändra
+        div 
+            h2 Gjort 
+            section.todo-container
+                - @done_todos.each do |todo|
+                    article.todo.done
+                        h3 = todo["name"]
+                        span.category = todo["category_name"]
+                        p = todo["description"]
+                        .todo-actions-container
+                            form action="/todos/#{todo["id"]}/update" method="post"
+                                input type="checkbox" hidden=true name="is_done" value="0" checked="0" 
+                                input type="submit" value="Flytta tillbaka"
+                            form action="/todos/#{todo["id"]}/delete" method="post"
+                                input type="submit" value="Radera"
+                            a href="/todos/#{todo["id"]}/edit" Ändra
 
     div
         h2 Skapa todo 
@@ -17,6 +37,12 @@
             .form-group 
                 label for="name" Namn
                 input name="name" placeholder="Namn"
+            .form-group 
+                label for="category" Kategori 
+                select name="category" id="category"
+                    option value="" Kategorilös
+                    - @categories.each do |category|
+                        option value=category["id"] = category["name"]
             .form-group 
                 label for="description" Beskrivning 
                 input name="description" placeholder="Beskrivning"
