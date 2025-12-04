@@ -6,7 +6,7 @@
                 - @undone_todos.each do |todo|
                     article.todo
                         h3 = todo["name"]
-                        span.category = todo["category_name"]
+                        span.category = (@todo_categories[todo["id"]]).map {|a| a["name"]}.join(", ")
                         p = todo["description"]
                         .todo-actions-container
                             form action="/todos/#{todo["id"]}/update" method="post"
@@ -21,7 +21,7 @@
                 - @done_todos.each do |todo|
                     article.todo.done
                         h3 = todo["name"]
-                        span.category = todo["category_name"]
+                        span.category = (@todo_categories[todo["id"]]).map {|a| a["name"]}.join(", ")
                         p = todo["description"]
                         .todo-actions-container
                             form action="/todos/#{todo["id"]}/update" method="post"
@@ -39,11 +39,11 @@
                 input name="name" placeholder="Namn"
             .form-group 
                 label for="category" Kategori 
-                select name="category" id="category"
-                    option value="" Kategorilös
+                select name="category[]" id="category" multiple=true
+                    / option value="" Kategorilös
                     - @categories.each do |category|
                         option value=category["id"] = category["name"]
             .form-group 
                 label for="description" Beskrivning 
-                input name="description" placeholder="Beskrivning"
+                textarea  name="description" placeholder="Beskrivning"
             input type="submit" value="Spara"

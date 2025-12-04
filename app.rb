@@ -12,13 +12,17 @@ def connectToDb()
 end
 
 def getTodoById(db, id)
-    todo = db.execute("SELECT todos.id, todos.name, todos.description, todos.is_done, todos.category_id,categories.name as category_name FROM todos LEFT JOIN categories ON todos.category_id = categories.id WHERE todos.id=?", id)
-    p todo
+    todo = db.execute("SELECT * FROM todos WHERE todos.id=?", id)
     if !todo
         return nil
     end
 
     return todo[0]
+end
+
+def getTodoCategories(db, id)
+    categories = db.execute("SELECT categories.id, categories.name FROM categories INNER JOIN todo_cat_rel ON categories.id = todo_cat_rel.category_id WHERE todo_cat_rel.todo_id = ?", id)
+    return categories
 end
 
 def getCategoryById(db, id) 
@@ -37,8 +41,12 @@ end
 get "/todos" do
     db = connectToDb()
     
-    todos = db.execute("SELECT todos.id, todos.name, todos.description, todos.is_done, todos.category_id,categories.name as category_name FROM todos LEFT JOIN categories ON todos.category_id = categories.id")
-    p todos
+    todos = db.execute("SELECT * FROM todos")
+    @todo_categories = {}
+    todos.each do |todo|
+      @todo_categories[todo["id"]] = getTodoCategories(db, todo["id"])
+      p @todo_categories[todo["id"]]
+    end
 
     @done_todos = todos.select { |todo| todo["is_done"] == 1 }
     @undone_todos = todos.select { |todo| todo["is_done"] == 0 }
@@ -52,18 +60,25 @@ post "/todos" do
 
     name = params[:name]
     description = params[:description]
-    category_id = params[:category].to_i
+    category_ids = (params[:category] || []).map {|v| v.to_i}
 
     if name.include? "roblox" or name.include? "robux"
         return redirect("https://tenor.com/p8jv5bc6AED.gif")
     end
 
-    category = getCategoryById(db, category_id)
-    if !category
-        error(404)
+    category_ids.each do |category_id|
+        category = getCategoryById(db, category_id)
+        if !category
+            error(404)
+        end
     end
 
-    db.execute("INSERT INTO todos (name, description, category_id) VALUES (?, ?, ?)", [name, description, category_id])
+    id = db.execute("INSERT INTO todos (name, description) VALUES (?, ?) RETURNING id", [name, description])[0]["id"]
+    p id
+
+    category_ids.each do |category_id|
+        db.execute("INSERT INTO todo_cat_rel (todo_id, category_id) VALUES (?, ?)", [id, category_id])
+    end
 
     redirect("/todos")
 end
@@ -79,6 +94,7 @@ get "/todos/:id/edit" do
     end
 
     @categories = db.execute("SELECT * FROM categories")
+    @todo_categories = getTodoCategories(db, @todo["id"]).map {|category| category["id"]}
 
     slim(:"todos/edit")
 end
@@ -95,11 +111,11 @@ post "/todos/:id/update" do
     name = params[:name]
     description = params[:description]
     is_done = params[:is_done].to_i
-    category_id = params[:category].to_i
+    category_ids = (params[:category] || []).map {|v| v.to_i}
 
-    if category_id == 0 
-        category_id = nil
-    else
+    p params.inspect
+
+    category_ids.each do |category_id|
         category = getCategoryById(db, category_id)
         if !category
             error(404)
@@ -109,7 +125,13 @@ post "/todos/:id/update" do
     if is_done != nil and name == nil
         db.execute("UPDATE todos SET is_done=? WHERE id=?", [is_done, id])
     else
-        db.execute("UPDATE todos SET name=?, description=?, is_done=?, category_id=? WHERE id=?", [name, description, is_done, category_id, id])
+        db.execute("DELETE FROM todo_cat_rel WHERE todo_id = ?", [id])
+
+        category_ids.each do |category_id|
+            db.execute("INSERT INTO todo_cat_rel (todo_id, category_id) VALUES (?, ?)", [id, category_id])
+        end
+
+        db.execute("UPDATE todos SET name=?, description=?, is_done=? WHERE id=?", [name, description, is_done, id])
     end
 
     redirect("/todos")
@@ -183,6 +205,7 @@ post "/categories/:id/delete" do
         error(404)
     end
 
+    db.execute("DELETE FROM todo_cat_rel WHERE category_id=?", [id])
     db.execute("DELETE FROM categories WHERE id=?", id)
 
     redirect("/categories")
