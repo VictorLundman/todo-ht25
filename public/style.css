@@ -47,5 +47,10 @@ body {
 
 header {
   display: flex;
+  justify-content: space-between;
+}
+
+header div {
+  display: flex;
   gap: 1rem;
 }

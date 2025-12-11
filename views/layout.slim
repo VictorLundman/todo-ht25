@@ -7,7 +7,16 @@ html lang="en"
     title Todo
   body 
     header 
-      a href="/todos" Todos
-      a href="/categories" Kategorier
+      div 
+        a href="/todos" Todos
+        a href="/categories" Kategorier
+      div
+        - if @user == nil then
+          a href="/login" Inloggning
+          a href="/user" Skapa konto
+        - else
+          span = @user["username"]
+          form action="/logout" method="post"
+            input type="submit" value="Logga ut"
     main
       ==yield
